@@ -8,6 +8,10 @@ export class UserService {
   constructor(@InjectRepository(User) private readonly userReposetory: Repository<User>) {}
   
   save(options) {
-    this.userReposetory.save(options)
+    return this.userReposetory.save(options)
+  }
+
+  findOne(options) {
+    return this.userReposetory.findOne(options)
   }
 }
