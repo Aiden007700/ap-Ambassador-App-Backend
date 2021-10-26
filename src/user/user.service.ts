@@ -7,11 +7,15 @@ import { User } from './entities/user.entity';
 export class UserService {
   constructor(@InjectRepository(User) private readonly userReposetory: Repository<User>) {}
   
-  save(options) {
-    return this.userReposetory.save(options)
+  async save(options) {
+    return await this.userReposetory.save(options)
   }
 
-  findOne(options) {
-    return this.userReposetory.findOne(options)
+  async findOne(options) {
+    return await this.userReposetory.findOne(options)
+  }
+
+  async update(id: number, options) {
+    return await this.userReposetory.update(id, options)
   }
 }

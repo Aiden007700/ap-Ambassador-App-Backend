@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException, NotFoundException, Res, Req, UseInterceptors, ClassSerializerInterceptor, ForbiddenException, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException, NotFoundException, Res, Req, UseInterceptors, ClassSerializerInterceptor, ForbiddenException, UseGuards, Put } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -77,5 +77,39 @@ export class AuthController {
     return {
       message: 'sucsess'
     }
+  }
+
+  @Put('/admin/user/info')
+  @UseGuards(AuthGuard)
+  async updateInfo(
+    @Req() request: Request,
+    @Body('firstName') firstName: string,
+    @Body('lastName') lastName: string,
+    @Body('email') email: string,
+    ) {
+    const cookie = request.cookies['jwt']
+    const {id} = await this.jwtService.verifyAsync(cookie)
+
+    await this.userService.update(id, {firstName, lastName, email})
+    return await this.userService.findOne(id)
+  }
+
+  @Put('/admin/user/info')
+  @UseGuards(AuthGuard)
+  async updatePassword(
+    @Req() request: Request,
+    @Body('password') password: string,
+    @Body('passwordConfirm') passwordConfirm: string,
+    ) {
+    if (password !== passwordConfirm) {
+      throw new BadRequestException('Passwords do not match!')
+    }
+
+    const cookie = request.cookies['jwt']
+    const {id} = await this.jwtService.verifyAsync(cookie)
+    const hash = await bcrypt.hash(password, 12)
+
+    await this.userService.update(id, {password: hash})
+    return await this.userService.findOne(id)
   }
 }
