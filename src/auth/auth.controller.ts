@@ -18,17 +18,7 @@ export class AuthController {
 
   @Post('/admin/register')
   async register(@Body() body: RegisterDto) {
-    const {passwordConfirm, ...data} = body
-    if(data.password !== passwordConfirm) {
-      throw new BadRequestException('Passwords do not match!')
-    }
-    const hash = await bcrypt.hash(data.password, 12)
-
-    return await this.userService.save({
-      ...data,
-      password: hash,
-      isAmbassador: false
-    })
+    return await this.authService.register(body)
   }
 
   @Post('/admin/login')
@@ -37,36 +27,13 @@ export class AuthController {
     @Body('password') password: string,
     @Res({passthrough: true}) response: Response
   ) {
-    const user = await this.userService.findOne({email})
-    if (!user) {
-      throw new NotFoundException('user not found')
-    }
-
-    if (! await bcrypt.compare(password, user.password)) {
-      throw new BadRequestException('Invalid Credentials')
-    }
-
-    const jwt = await this.jwtService.signAsync({
-      id: user.id,
-
-    })
-
-    response.cookie('jwt', jwt, {httpOnly: true})
-
-    return {
-      message: 'sucsess'
-    }
+    return await this.authService.login(email, password, response)
   }
 
   @Get('/admin/user') 
   @UseGuards(AuthGuard)
   async user(@Req() request: Request) {
-    const cookie = request.cookies['jwt']
-
-    const {id} = await this.jwtService.verifyAsync(cookie)
-    const user = await this.userService.findOne({id})
-
-    return user
+    return await this.user(request)
   }
 
   @Post('/admin/logout')
@@ -87,19 +54,13 @@ export class AuthController {
     @Body('lastName') lastName: string,
     @Body('email') email: string,
     ) {
-    const cookie = request.cookies['jwt']
-    const {id} = await this.jwtService.verifyAsync(cookie)
-
-    await this.userService.update(id, {firstName, lastName, email})
-    return await this.userService.findOne(id)
+   return await this.authService.updateInfo(request ,firstName, lastName, email)
   }
 
-  @Put('/admin/user/info')
-  @UseGuards(AuthGuard)
   async updatePassword(
-    @Req() request: Request,
-    @Body('password') password: string,
-    @Body('passwordConfirm') passwordConfirm: string,
+    request: Request,
+    password: string,
+    passwordConfirm: string,
     ) {
     if (password !== passwordConfirm) {
       throw new BadRequestException('Passwords do not match!')

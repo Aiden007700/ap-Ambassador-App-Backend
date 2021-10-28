@@ -18,4 +18,8 @@ export class UserService {
   async update(id: number, options) {
     return await this.userReposetory.update(id, options)
   }
+
+  async find(options) {
+    return await this.userReposetory.find(options)
+  }
 }
