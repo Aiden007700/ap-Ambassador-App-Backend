@@ -1,5 +1,5 @@
 import { NestFactory } from "@nestjs/core";
-import { randomInt } from "crypto";
+import {randomInt} from "crypto";
 import * as faker from 'faker'
 import { AppModule } from "../app.module";
 import { ProductService } from "../product/product.service";
@@ -15,7 +15,7 @@ import { ProductService } from "../product/product.service";
             title: faker.lorem.words(2),
             description: faker.lorem.words(10),
             image: faker.image.imageUrl(200, 200, '', true),
-            price: Math.floor(Math.random() * 110) - 10
+            price: Math.floor(Math.random() * 90) + 10
         })
     }
 
