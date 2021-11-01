@@ -8,6 +8,9 @@ import { Product } from './product/entities/product.entity';
 import { OrderModule } from './order/order.module';
 import { Order } from './order/entities/order';
 import { OrderItem } from './order/entities/order-item';
+import { LinkModule } from './link/link.module';
+import { Link } from './link/entites/link';
+import { SharedModule } from './shared/shared.module';
 
 @Module({
   imports: [
@@ -18,13 +21,15 @@ import { OrderItem } from './order/entities/order-item';
       username: 'root',
       password: 'root',
       database: 'db',
-      entities: [User, Product, Order, OrderItem],
-      synchronize: true
+      entities: [User, Product, Order, OrderItem, Link],
+      synchronize: false
     }),
     UserModule,
     AuthModule,
     ProductModule,
-    OrderModule
+    OrderModule,
+    LinkModule,
+    SharedModule
   ],
 })
 export class AppModule {}

@@ -1,4 +1,7 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Exclude, Expose } from "class-transformer";
+import { link } from "fs";
+import { Link } from "src/link/entites/link";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { OrderItem } from "./order-item";
 
 @Entity()
@@ -16,12 +19,22 @@ export class Order {
     @Column()
     code: string
 
+    @ManyToOne(() => Link, link => link.order, {
+        createForeignKeyConstraints: false
+    })
+    @JoinColumn({
+        referencedColumnName: 'code', name: 'code'
+    })
+    link: Link
+
     @Column()
     ambassador_email: string
 
+    @Exclude()
     @Column()
     firstName: string
 
+    @Exclude()
     @Column()
     lastName: string
 
@@ -40,9 +53,20 @@ export class Order {
     @Column({nullable: true})
     zip: string
 
+    @Exclude()
     @Column({default: false})
     complete: boolean
 
     @OneToMany(() => OrderItem, orderItem=> orderItem.order)
     orderItem: OrderItem[]
+
+    @Expose()
+    get name() {
+        return `${this.firstName} ${this.lastName}`
+    } 
+
+    @Expose()
+    get total() {
+        return this.orderItem.reduce((acc, item) => acc + item.adminRevene, 0)
+    }
 }
